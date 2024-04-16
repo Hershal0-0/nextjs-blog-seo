@@ -2,7 +2,17 @@ import { Blog, allBlogs } from "@/.contentlayer/generated";
 import BlogDetails from "@/src/components/Blog/BlogDetails";
 import RenderMdx from "@/src/components/Blog/RenderMdx";
 import Tag from "@/src/components/Elements/Tag";
+import { BlogTOC } from "@/src/types/blog";
+import { slug } from "github-slugger";
 import Image from "next/image";
+
+export async function generateStaticParams() {
+  return allBlogs.map((blog: Blog) => {
+    return {
+      slug: blog._raw.flattenedPath,
+    };
+  });
+}
 
 export default function BlogPage({ params }: { params: { slug: string } }) {
   const blog = allBlogs.find((blog: Blog) => {
@@ -16,7 +26,7 @@ export default function BlogPage({ params }: { params: { slug: string } }) {
           {blog?.tags && (
             <Tag
               name={blog?.tags[0]}
-              link={`/categories/${blog?.tags[0]}`}
+              link={`/categories/${slug(blog?.tags[0])}`}
               className="px-6 text-sm py-2"
             />
           )}
@@ -36,10 +46,41 @@ export default function BlogPage({ params }: { params: { slug: string } }) {
           sizes="(max-width: 640px) 100vw,(max-width: 1024px) 50vw, 33vw"
         />
       </div>
-      <BlogDetails blog={blog} slug={params.slug} />
+      <BlogDetails blog={blog} blogSlug={params.slug} />
 
       <div className="grid grid-cols-12 gap-16 mt-8 px-10">
-        <div className="col-span-4">Toc</div>
+        <div className="col-span-4">
+          <details
+            className="border-[1px] border-solid border-dark text-dark rounded-lg p-4 sticky top-6 max-h-[80vh] overflow-hidden overflow-y-auto"
+            open
+          >
+            <summary className="text-lg font-semibold capitalize cursor-pointer">
+              Table Of Content
+            </summary>
+            <ul className="mt-4 font-in text-base">
+              {blog?.toc.map((heading: BlogTOC) => {
+                return (
+                  <li key={`#${heading.slug}`} className="py-1">
+                    <a
+                      href={`#${heading.slug}`}
+                      data-level={heading.level}
+                      className="data-[level=two]:pl-0 data-[level=two]:pt-2 data-[level=two]:border-t border-solid border-dark/40
+                      data-[level=three]:pl-6 flex items-center justify-start
+                      "
+                    >
+                      {heading.level === "three" ? (
+                        <span className="flex w-1 h-1 rounded-full bg-dark mr-2">
+                          &nbsp;
+                        </span>
+                      ) : null}
+                      <span className="hover:underline">{heading.text}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        </div>
         <RenderMdx blog={blog} />
       </div>
     </article>
