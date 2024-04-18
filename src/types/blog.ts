@@ -3,3 +3,9 @@ export interface BlogTOC {
   text: string;
   slug: string;
 }
+
+export interface slugParamProps {
+  params: {
+    slug: string;
+  };
+}

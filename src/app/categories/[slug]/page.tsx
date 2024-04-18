@@ -1,10 +1,21 @@
-import { allBlogs } from "@/.contentlayer/generated";
+import { Blog, allBlogs } from "@/.contentlayer/generated";
 import BlogLayout3 from "@/src/components/Blog/BlogLayout3";
 import Categories from "@/src/components/Blog/Categories";
+import { slugParamProps } from "@/src/types/blog";
+import { siteMetadata } from "@/src/utils/siteMetaData";
 import GithubSlugger, { slug } from "github-slugger";
 import React from "react";
 
 const slugger = new GithubSlugger();
+
+export async function generateMetadata({ params }: slugParamProps) {
+  return {
+    title: `${params.slug.replaceAll("-", " ")}`,
+    description: `Learn More About ${
+      params.slug === "all" ? "web development" : params.slug
+    } through of out collection of expert blogs and tutorials`,
+  };
+}
 
 export async function generateStaticParams() {
   const categories: string[] = [];
