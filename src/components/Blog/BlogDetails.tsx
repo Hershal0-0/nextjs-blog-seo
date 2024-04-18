@@ -3,6 +3,7 @@ import { format, parseISO } from "date-fns";
 import { slug } from "github-slugger";
 import Link from "next/link";
 import React from "react";
+import ViewCounter from "./ViewCounter";
 
 interface BlogDetailsInterface {
   blog?: Blog;
@@ -14,7 +15,9 @@ const BlogDetails = ({ blog, blogSlug }: BlogDetailsInterface) => {
       {blog && (
         <time>{format(parseISO(blog?.publishedAt), "LLLL d, yyyy")}</time>
       )}
-      <span>10 views</span>
+      <span>
+        <ViewCounter slug={blogSlug} />
+      </span>
       <div>{blog?.readingTime.text}</div>
       <Link href={`/categories/${blog?.tags ? slug(blog?.tags[0]) : ""}`}>
         #{blog?.tags ? slug(blog?.tags[0]) : ""}
